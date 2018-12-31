@@ -223,7 +223,7 @@ print ("human faces in dog images property is %s" % dog_property)
 # 
 # __回答:__
 # * 现实的情况是非常复杂的，做系统的最终也是为服务客户或是方便客户的，如果要求客户这样不会给用户带来多少便捷，而是增加了客户的使用负担，所有不合理。
-# * 方法就是增强图片。
+# * 可以使用adaboost，把一些弱分类特征，强化成一个强的特征分类器。然后使用级联把这些强分类器结合在一块。
 # 
 # 
 
@@ -499,6 +499,10 @@ test_tensors = paths_to_tensor(test_files).astype('float32')/255
 # 2. 你也可以根据上图提示的步骤搭建卷积网络，那么请说明为何如上的架构能够在该问题上取得很好的表现。
 # 
 # __回答:__ 
+# 
+# * 我搭建的CNN模型是这样，首先一个Conv2D, MaxPooling2D, Conv2D, GlobalAveragePooling2D, Dense，这样搭建的原因是首先进行卷积运算，由于参数比较多，中间会加上最大池化层来降低神经元数量，最后得到一个全连接层平铺层，标准的CNN模型来训练图片。
+# 
+# * 在第一层的卷积里面，strides为1，能够更好的对图片进行全方位的卷积运算，并且卷积层和最大池化层的交替很好的解决参数过多的问题
 
 # In[13]:
 
@@ -739,7 +743,16 @@ test_Xception = bottleneck_features['test']
 # 
 # __回答:__ 
 # 
+# * 首先使用xception作为模型的输入，把xception模型的输出作为第一个全局平均池化层的输入，然后使用softmax作为最后一个全连接层的激活函数。
+# * 使用该网络架构，1、利用xception的模型训练结构，然后利用最后两层，转换成分类狗狗需要的模型结构。2、第二个因为xception是一个轻量级的神经网络，他是在inception v3的基础上进行改进得来的，很快能让参数维度降到一定水平，提高运行效率。
 # 
+# 1.为什么这一架构会在这一分类任务中成功？
+# 2.为什么早期（第三步和第四步 ）的尝试不成功？
+# 
+# __回答__
+# 
+# * Xception结构是带有残差连接的深度可分卷积层的线性堆叠，非常利于定义和修改，并且轻量化。
+# * 早期的的第三步是从开始搭建一个神经网路，并且搭建的神经网络是一个非常简单化，层次（隐藏层）比较少单一化神经网络。第四步使用了VGG16来迁移学习，但是VGG16，网络庞大，过于复杂的结构不利用定义和修改，模型的深度化容易造成梯度消失问题，不能很好的进行特征学习。
 
 # In[26]:
 
@@ -757,7 +770,7 @@ Xception_model.summary()
 
 
 ### TODO: 编译模型
-Xception_model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+Xception_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 
 # ---

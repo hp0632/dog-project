@@ -13479,7 +13479,7 @@ human faces in dog images property is 0.11
 <p><strong>回答:</strong></p>
 <ul>
 <li>现实的情况是非常复杂的，做系统的最终也是为服务客户或是方便客户的，如果要求客户这样不会给用户带来多少便捷，而是增加了客户的使用负担，所有不合理。</li>
-<li>方法就是增强图片。</li>
+<li>可以使用adaboost，把一些弱分类特征，强化成一个强的特征分类器。然后使用级联把这些强分类器结合在一块。</li>
 </ul>
 
 </div>
@@ -13972,6 +13972,12 @@ human in dog images property using resnet is 1.0
 <li>你也可以根据上图提示的步骤搭建卷积网络，那么请说明为何如上的架构能够在该问题上取得很好的表现。</li>
 </ol>
 <p><strong>回答:</strong></p>
+<ul>
+<li><p>我搭建的CNN模型是这样，首先一个Conv2D, MaxPooling2D, Conv2D, GlobalAveragePooling2D, Dense，这样搭建的原因是首先进行卷积运算，由于参数比较多，中间会加上最大池化层来降低神经元数量，最后得到一个全连接层平铺层，标准的CNN模型来训练图片。</p>
+</li>
+<li><p>在第一层的卷积里面，strides为1，能够更好的对图片进行全方位的卷积运算，并且卷积层和最大池化层的交替很好的解决参数过多的问题</p>
+</li>
+</ul>
 
 </div>
 </div>
@@ -14562,6 +14568,17 @@ test_{network} = bottleneck_features['test']</code></pre>
 <p><a id='question6'></a></p>
 <h3 id="&#38382;&#39064;-6:"><strong>&#38382;&#39064; 6:</strong><a class="anchor-link" href="#&#38382;&#39064;-6:">&#182;</a></h3><p>在下方的代码块中尝试使用 Keras 搭建最终的网络架构，并回答你实现最终 CNN 架构的步骤与每一步的作用，并描述你在迁移学习过程中，使用该网络架构的原因。</p>
 <p><strong>回答:</strong></p>
+<ul>
+<li>首先使用xception作为模型的输入，把xception模型的输出作为第一个全局平均池化层的输入，然后使用softmax作为最后一个全连接层的激活函数。</li>
+<li>使用该网络架构，1、利用xception的模型训练结构，然后利用最后两层，转换成分类狗狗需要的模型结构。2、第二个因为xception是一个轻量级的神经网络，他是在inception v3的基础上进行改进得来的，很快能让参数维度降到一定水平，提高运行效率。</li>
+</ul>
+<p>1.为什么这一架构会在这一分类任务中成功？
+2.为什么早期（第三步和第四步 ）的尝试不成功？</p>
+<p><strong>回答</strong></p>
+<ul>
+<li>Xception结构是带有残差连接的深度可分卷积层的线性堆叠，非常利于定义和修改，并且轻量化。</li>
+<li>早期的的第三步是从开始搭建一个神经网路，并且搭建的神经网络是一个非常简单化，层次（隐藏层）比较少单一化神经网络。第四步使用了VGG16来迁移学习，但是VGG16，网络庞大，过于复杂的结构不利用定义和修改，模型的深度化容易造成梯度消失问题，不能很好的进行特征学习。</li>
+</ul>
 
 </div>
 </div>
@@ -14619,7 +14636,7 @@ _________________________________________________________________
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">### TODO: 编译模型</span>
-<span class="n">Xception_model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s1">&#39;rmsprop&#39;</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s1">&#39;categorical_crossentropy&#39;</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">])</span>
+<span class="n">Xception_model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s1">&#39;adam&#39;</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s1">&#39;categorical_crossentropy&#39;</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">])</span>
 </pre></div>
 
     </div>
